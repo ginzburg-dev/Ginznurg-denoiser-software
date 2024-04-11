@@ -266,1044 +266,691 @@ bool initializeOptions(int argc, char* argv[], imageOptions &iOpt, kernelOptions
 			helpMessage(argv[0]);
 			return 0;
 		}
-		else
-			if ((arg == "-nf") || (arg == "--numberFrames"))
+
+		if ((arg == "-nf") || (arg == "--numberFrames"))
+		{
+			if (i + 1 < argc)
 			{
-				if (i + 1 < argc)
-				{
-					iOpt.nFrames = std::atoi(argv[++i]);
+				iOpt.nFrames = std::atoi(argv[++i]);
+				iOpt.existsFrame.resizeErase(iOpt.nFrames);
+				if (iOpt.nFrames < 1) {
+					iOpt.nFrames = 1;
 					iOpt.existsFrame.resizeErase(iOpt.nFrames);
-					if (iOpt.nFrames < 1) {
-						iOpt.nFrames = 1;
-						iOpt.existsFrame.resizeErase(iOpt.nFrames);
-					}
-					if (iOpt.nFrames > 11)
-					{
-						iOpt.nFrames = 11;
-						iOpt.existsFrame.resizeErase(iOpt.nFrames);
-						std::cerr << "There are only 11 images available per frame. Be aware that multiple frames will be reused." << std::endl;
-					}
 				}
-				else
+				if (iOpt.nFrames > 11)
 				{
-					std::cerr << "--numberFrames option requires one argument." << std::endl;
-					return 0;
+					iOpt.nFrames = 11;
+					iOpt.existsFrame.resizeErase(iOpt.nFrames);
+					std::cerr << "There are only 11 images available per frame. Be aware that multiple frames will be reused." << std::endl;
 				}
 			}
 			else
-				if ((arg == "-s") || (arg == "--startFrame"))
-				{
-					if (i + 1 < argc)
-					{
-						iOpt.startFrame = std::atoi(argv[++i]);
-						if (iOpt.startFrame < 0)
-							iOpt.startFrame = 0;
-					}
-					else
-					{
-						std::cerr << "--startFrame option requires one argument." << std::endl;
-						return 0;
-					}
+			{
+				std::cerr << "--numberFrames option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+
+		if ((arg == "-s") || (arg == "--startFrame"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.startFrame = std::atoi(argv[++i]);
+				if (iOpt.startFrame < 0)
+					iOpt.startFrame = 0;
+			}
+			else
+			{
+				std::cerr << "--startFrame option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		
+        if ((arg == "-e") || (arg == "--endFrame"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.endFrame = std::atoi(argv[++i]);
+				if (iOpt.endFrame < 0)
+					iOpt.endFrame = 0;
+			}
+			else
+			{
+				std::cerr << "--endFrame option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+        
+        if ((arg == "-runBlock") || (arg == "--runBlock"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.runBlock = std::atoi(argv[++i]);
+				if (iOpt.runBlock < 0)
+					iOpt.runBlock = 0;
+			}
+			else
+			{
+				std::cerr << "--runBlock option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-mvt") || (arg == "--mvType"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.mvType = argv[++i];
+			}
+			else
+			{
+				std::cerr << "--mvType option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-runMode"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.runMode = argv[++i];
+			}
+			else
+			{
+				std::cerr << "-runMode option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fmode") || (arg == "--filterMode"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.kernelMode = argv[++i];
+			}
+			else
+			{
+				std::cerr << "--filterMode option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-exrlayers") || (arg == "--exrlayers"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.exrlayers = argv[++i];
+			}
+			else
+			{
+				std::cerr << "--ExrLayers option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-ncores") || (arg == "--numberCores"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.nCores = std::atoi(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--numberCores option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-oPostfix") || (arg == "--OutPostfix"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.oPostfix = argv[++i];
+			}
+			else
+			{
+				std::cerr << "--OutPostfix option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-mvs") || (arg == "--mvScale"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.mvScale = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--mvScale option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-kp") || (arg == "--kernelPreset"))
+		{
+			if (i + 1 < argc)
+			{
+				setKernelPreset(argv[++i], kernelOpt);
+            }
+			else
+			{
+				std::cerr << "--kernelPreset option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-bc") || (arg == "--beautyChannel"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.fnameBeauty = argv[++i];
+			}
+			else
+			{
+				std::cerr << "--beautyChannel option requires one argument." << std::endl;
+				return 0;
+			}
+        }
+		if ((arg == "-nc") || (arg == "--normalChannel"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.fnameNormal = argv[++i];
+			}
+			else
+			{
+				std::cerr << "--normalChannel option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-ac") || (arg == "--albedoChannel"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.fnameAlbedo = argv[++i];
+			}
+			else
+			{
+				std::cerr << "--albedoChannel option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-pc") || (arg == "--positionChannel"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.fnamePosition = argv[++i];
+			}
+			else
+			{
+				std::cerr << "--positionChannel option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-dc") || (arg == "--DepthChannel"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.fnameDepth = argv[++i];
+			}
+			else
+			{
+				std::cerr << "--DepthChannel option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-ch") || (arg == "--Channels"))
+		{
+			if (i + 1 < argc)
+			{
+				for (int nch = i + 1; nch < argc; nch++) {
+					iOpt.fnameChannels[nch - i - 1] = argv[nch];
 				}
-				else
-					if ((arg == "-e") || (arg == "--endFrame"))
-					{
-						if (i + 1 < argc)
-						{
-							iOpt.endFrame = std::atoi(argv[++i]);
-							if (iOpt.endFrame < 0)
-								iOpt.endFrame = 0;
-						}
-						else
-						{
-							std::cerr << "--endFrame option requires one argument." << std::endl;
-							return 0;
-						}
-					}
-					else
-						if ((arg == "-runBlock") || (arg == "--runBlock"))
-						{
-							if (i + 1 < argc)
-							{
-								iOpt.runBlock = std::atoi(argv[++i]);
-								if (iOpt.runBlock < 0)
-									iOpt.runBlock = 0;
-							}
-							else
-							{
-								std::cerr << "--runBlock option requires one argument." << std::endl;
-								return 0;
-							}
-						}
-						else
-							if ((arg == "-mvt") || (arg == "--mvType"))
-							{
-								if (i + 1 < argc)
-								{
-									iOpt.mvType = argv[++i];
-								}
-								else
-								{
-									std::cerr << "--mvType option requires one argument." << std::endl;
-									return 0;
-								}
-							}
-							else
-								if ((arg == "-runMode"))
-								{
-									if (i + 1 < argc)
-									{
-										iOpt.runMode = argv[++i];
-									}
-									else
-									{
-										std::cerr << "-runMode option requires one argument." << std::endl;
-										return 0;
-									}
-								}
-								else
-									if ((arg == "-fmode") || (arg == "--filterMode"))
-									{
-										if (i + 1 < argc)
-										{
-											kernelOpt.kernelMode = argv[++i];
-										}
-										else
-										{
-											std::cerr << "--filterMode option requires one argument." << std::endl;
-											return 0;
-										}
-									}
-									else
-										if ((arg == "-exrlayers") || (arg == "--exrlayers"))
-										{
-											if (i + 1 < argc)
-											{
-												iOpt.exrlayers = argv[++i];
-											}
-											else
-											{
-												std::cerr << "--ExrLayers option requires one argument." << std::endl;
-												return 0;
-											}
-										}
-										else
-											if ((arg == "-ncores") || (arg == "--numberCores"))
-											{
-												if (i + 1 < argc)
-												{
-													iOpt.nCores = std::atoi(argv[++i]);
-												}
-												else
-												{
-													std::cerr << "--numberCores option requires one argument." << std::endl;
-													return 0;
-												}
-											}
-											else
-												if ((arg == "-oPostfix") || (arg == "--OutPostfix"))
-												{
-													if (i + 1 < argc)
-													{
-														iOpt.oPostfix = argv[++i];
-													}
-													else
-													{
-														std::cerr << "--OutPostfix option requires one argument." << std::endl;
-														return 0;
-													}
-												}
-												else
-													if ((arg == "-mvs") || (arg == "--mvScale"))
-													{
-														if (i + 1 < argc)
-														{
-															iOpt.mvScale = std::atof(argv[++i]);
-														}
-														else
-														{
-															std::cerr << "--mvScale option requires one argument." << std::endl;
-															return 0;
-														}
-													}
-													else
-														if ((arg == "-kp") || (arg == "--kernelPreset"))
-														{
-															if (i + 1 < argc)
-															{
-																setKernelPreset(argv[++i], kernelOpt);
-
-															}
-															else
-															{
-																std::cerr << "--kernelPreset option requires one argument." << std::endl;
-																return 0;
-															}
-														}
-														else
-															if ((arg == "-bc") || (arg == "--beautyChannel"))
-															{
-																if (i + 1 < argc)
-																{
-																	iOpt.fnameBeauty = argv[++i];
-																}
-																else
-																{
-																	std::cerr << "--beautyChannel option requires one argument." << std::endl;
-																	return 0;
-																}
-
-															}
-															else
-																if ((arg == "-nc") || (arg == "--normalChannel"))
-																{
-																	if (i + 1 < argc)
-																	{
-																		iOpt.fnameNormal = argv[++i];
-																	}
-																	else
-																	{
-																		std::cerr << "--normalChannel option requires one argument." << std::endl;
-																		return 0;
-																	}
-																}
-																else
-																	if ((arg == "-ac") || (arg == "--albedoChannel"))
-																	{
-																		if (i + 1 < argc)
-																		{
-																			iOpt.fnameAlbedo = argv[++i];
-																		}
-																		else
-																		{
-																			std::cerr << "--albedoChannel option requires one argument." << std::endl;
-																			return 0;
-																		}
-																	}
-																	else
-																		if ((arg == "-pc") || (arg == "--positionChannel"))
-																		{
-																			if (i + 1 < argc)
-																			{
-																				iOpt.fnamePosition = argv[++i];
-																			}
-																			else
-																			{
-																				std::cerr << "--positionChannel option requires one argument." << std::endl;
-																				return 0;
-																			}
-																		}
-																		else
-																			if ((arg == "-dc") || (arg == "--DepthChannel"))
-																			{
-																				if (i + 1 < argc)
-																				{
-																					iOpt.fnameDepth = argv[++i];
-																				}
-																				else
-																				{
-																					std::cerr << "--DepthChannel option requires one argument." << std::endl;
-																					return 0;
-																				}
-																			}
-																			else
-																				if ((arg == "-ch") || (arg == "--Channels"))
-																				{
-																					if (i + 1 < argc)
-																					{
-																						for (int nch = i + 1; nch < argc; nch++) {
-																							iOpt.fnameChannels[nch - i - 1] = argv[nch];
-																						}
-																						iOpt.nChannels = argc - i - 1;
-																					}
-																					else
-																					{
-																						std::cerr << "--Channels option requires one argument." << std::endl;
-																						return 0;
-																					}
-																				}
-																				else
-																					if ((arg == "-sc") || (arg == "--SpecularChannel"))
-																					{
-																						if (i + 1 < argc)
-																						{
-																							iOpt.fnameSpecular = argv[++i];
-																						}
-																						else
-																						{
-																							std::cerr << "--SpecularChannel option requires one argument." << std::endl;
-																							return 0;
-																						}
-																					}
-																					else
-																						if ((arg == "-isc") || (arg == "--IndirectSpecularChannel"))
-																						{
-																							if (i + 1 < argc)
-																							{
-																								iOpt.fnameIndirectSpecular = argv[++i];
-																							}
-																							else
-																							{
-																								std::cerr << "--IndirectSpecularChannel option requires one argument." << std::endl;
-																								return 0;
-																							}
-																						}
-																						else
-																							if ((arg == "-dic") || (arg == "--DiffuseChannel"))
-																							{
-																								if (i + 1 < argc)
-																								{
-																									iOpt.fnameDiffuse = argv[++i];
-																								}
-																								else
-																								{
-																									std::cerr << "--DiffuseChannel option requires one argument." << std::endl;
-																									return 0;
-																								}
-																							}
-																							else
-																								if ((arg == "-idic") || (arg == "--IndirectDiffuseChannel"))
-																								{
-																									if (i + 1 < argc)
-																									{
-																										iOpt.fnameIndirectDiffuse = argv[++i];
-																									}
-																									else
-																									{
-																										std::cerr << "--IndirectDiffuseChannel option requires one argument." << std::endl;
-																										return 0;
-																									}
-																								}
-																								else
-																									if ((arg == "-rc") || (arg == "--RefractionChannel"))
-																									{
-																										if (i + 1 < argc)
-																										{
-																											iOpt.fnameRefraction = argv[++i];
-																										}
-																										else
-																										{
-																											std::cerr << "--RefractionDiffuseChannel option requires one argument." << std::endl;
-																											return 0;
-																										}
-																									}
-																									else
-																										if ((arg == "-ffkernel") || (arg == "--fireflyKernel"))
-																										{
-																											if (i + 1 < argc)
-																											{
-																												kernelOpt.ffkernel = std::atoi(argv[++i]);
-
-																											}
-																											else
-																											{
-																												std::cerr << "--fireflyKernel option requires one argument." << std::endl;
-																												return 0;
-																											}
-																										}
-																										else
-																											if ((arg == "-ffgain") || (arg == "--fireflyGain"))
-																											{
-																												if (i + 1 < argc)
-																												{
-																													kernelOpt.ffGain = std::atof(argv[++i]);
-
-																												}
-																												else
-																												{
-																													std::cerr << "--fireflyGain option requires one argument." << std::endl;
-																													return 0;
-																												}
-																											}
-																											else
-																												if ((arg == "-ffsigma") || (arg == "--fireflySigma"))
-																												{
-																													if (i + 1 < argc)
-																													{
-																														kernelOpt.ffSigma = std::atof(argv[++i]);
-
-																													}
-																													else
-																													{
-																														std::cerr << "--fireflySigma option requires one argument." << std::endl;
-																														return 0;
-																													}
-																												}
-																												else
-																													if ((arg == "-ffgamma") || (arg == "--fireflyGamma"))
-																													{
-																														if (i + 1 < argc)
-																														{
-																															kernelOpt.ffGamma = std::atof(argv[++i]);
-																														}
-																														else
-																														{
-																															std::cerr << "--fireflyGamma option requires one argument." << std::endl;
-																															return 0;
-																														}
-																													}
-																													else
-																														if ((arg == "-ffRefractionStrange") || (arg == "--ffRefractionStrange"))
-																														{
-																															if (i + 1 < argc)
-																															{
-																																kernelOpt.ffRefractionStrange = std::atof(argv[++i]);
-																															}
-																															else
-																															{
-																																std::cerr << "--ffRefractionStrange option requires one argument." << std::endl;
-																																return 0;
-																															}
-																														}
-																														else
-																															if ((arg == "-ffIndirectSpecularStrange") || (arg == "--ffIndirectSpecularStrange"))
-																															{
-																																if (i + 1 < argc)
-																																{
-																																	kernelOpt.ffindirectSpecStrange = std::atof(argv[++i]);
-																																}
-																																else
-																																{
-																																	std::cerr << "--ffIndirectSpecularStrange option requires one argument." << std::endl;
-																																	return 0;
-																																}
-																															}
-																															else
-																																if ((arg == "-fsKernel") || (arg == "--filterSKernel"))
-																																{
-																																	if (i + 1 < argc)
-																																	{
-																																		kernelOpt.skernel = std::atoi(argv[++i]);
-																																	}
-																																	else
-																																	{
-																																		std::cerr << "--filterSKernel option requires one argument." << std::endl;
-																																		return 0;
-																																	}
-																																}
-																																else
-																																	if ((arg == "-fsRadius") || (arg == "--filterSRadius"))
-																																	{
-																																		if (i + 1 < argc)
-																																		{
-																																			kernelOpt.sradius = std::atoi(argv[++i]);
-																																		}
-																																		else
-																																		{
-																																			std::cerr << "--filterSRadius option requires one argument." << std::endl;
-																																			return 0;
-																																		}
-																																	}
-																																	else
-																																		if ((arg == "-fsSigmaColor") || (arg == "--filterSSigmaColor"))
-																																		{
-																																			if (i + 1 < argc)
-																																			{
-																																				kernelOpt.sColor = std::atof(argv[++i]);
-																																			}
-																																			else
-																																			{
-																																				std::cerr << "--filterSSigmaColor option requires one argument." << std::endl;
-																																				return 0;
-																																			}
-																																		}
-																																		else
-																																			if ((arg == "-fsSigmaAlbedo") || (arg == "--filterSSigmaAlbedo"))
-																																			{
-																																				if (i + 1 < argc)
-																																				{
-																																					kernelOpt.sAlbedo = std::atof(argv[++i]);
-																																				}
-																																				else
-																																				{
-																																					std::cerr << "--filterSSigmaAlbedo option requires one argument." << std::endl;
-																																					return 0;
-																																				}
-																																			}
-																																			else
-																																				if ((arg == "-fsSigmaNormal") || (arg == "--filterSSigmaNormal"))
-																																				{
-																																					if (i + 1 < argc)
-																																					{
-																																						kernelOpt.sNormal = std::atof(argv[++i]);
-																																					}
-																																					else
-																																					{
-																																						std::cerr << "--filterSSigmaNormal option requires one argument." << std::endl;
-																																						return 0;
-																																					}
-																																				}
-																																				else
-																																					if ((arg == "-fsSigmaDepth") || (arg == "--filterSSigmaDepth"))
-																																					{
-																																						if (i + 1 < argc)
-																																						{
-																																							kernelOpt.sDepth = std::atof(argv[++i]);
-																																						}
-																																						else
-																																						{
-																																							std::cerr << "--filterSSigmaDepth option requires one argument." << std::endl;
-																																							return 0;
-																																						}
-																																					}
-																																					else
-																																						if ((arg == "-fsSigmaAlpha") || (arg == "--filterSSigmaAlpha"))
-																																						{
-																																							if (i + 1 < argc)
-																																							{
-																																								kernelOpt.sAlpha = std::atof(argv[++i]);
-																																							}
-																																							else
-																																							{
-																																								std::cerr << "--filterSSigmaAlpha option requires one argument." << std::endl;
-																																								return 0;
-																																							}
-																																						}
-																																						else
-																																							if ((arg == "-fstSigmaColor") || (arg == "--filterSTSigmaColor"))
-																																							{
-																																								if (i + 1 < argc)
-																																								{
-																																									kernelOpt.stColor = std::atof(argv[++i]);
-																																								}
-																																								else
-																																								{
-																																									std::cerr << "--filterSTSigmaColor option requires one argument." << std::endl;
-																																									return 0;
-																																								}
-																																							}
-																																							else
-																																								if ((arg == "-fstSigmaAlbedo") || (arg == "--filterSTSigmaAlbedo"))
-																																								{
-																																									if (i + 1 < argc)
-																																									{
-																																										kernelOpt.stAlbedo = std::atof(argv[++i]);
-																																									}
-																																									else
-																																									{
-																																										std::cerr << "--filterSTSigmaAlbedo option requires one argument." << std::endl;
-																																										return 0;
-																																									}
-																																								}
-																																								else
-																																									if ((arg == "-fstSigmaNormal") || (arg == "--filterSTSigmaNormal"))
-																																									{
-																																										if (i + 1 < argc)
-																																										{
-																																											kernelOpt.stNormal = std::atof(argv[++i]);
-																																										}
-																																										else
-																																										{
-																																											std::cerr << "--filterSTSigmaNormal option requires one argument." << std::endl;
-																																											return 0;
-																																										}
-																																									}
-																																									else
-																																										if ((arg == "-fstSigmaDepth") || (arg == "--filterSTSigmaDepth"))
-																																										{
-																																											if (i + 1 < argc)
-																																											{
-																																												kernelOpt.stDepth = std::atof(argv[++i]);
-																																											}
-																																											else
-																																											{
-																																												std::cerr << "--filterSTSigmaDepth option requires one argument." << std::endl;
-																																												return 0;
-																																											}
-																																										}
-																																										else
-																																											if ((arg == "-fstSigmaAlpha") || (arg == "--filterSTSigmaAlpha"))
-																																											{
-																																												if (i + 1 < argc)
-																																												{
-																																													kernelOpt.stAlpha = std::atof(argv[++i]);
-																																												}
-																																												else
-																																												{
-																																													std::cerr << "--filterSTSigmaAlpha option requires one argument." << std::endl;
-																																													return 0;
-																																												}
-																																											}
-																																											else
-																																												if ((arg == "-fsFallof") || (arg == "--filterSFallof"))
-																																												{
-																																													if (i + 1 < argc)
-																																													{
-																																														kernelOpt.sFallof = std::atof(argv[++i]);
-																																													}
-																																													else
-																																													{
-																																														std::cerr << "--filterSFallof option requires one argument." << std::endl;
-																																														return 0;
-																																													}
-																																												}
-																																												else
-																																													if ((arg == "-fsw") || (arg == "--filterSWeight"))
-																																													{
-																																														if (i + 1 < argc)
-																																														{
-																																															kernelOpt.sWeight = std::atof(argv[++i]);
-																																															if (kernelOpt.sWeight > 1) {
-																																																kernelOpt.sWeight = 1;
-																																															}
-																																															if (kernelOpt.sWeight < 0) {
-																																																kernelOpt.sWeight = 0;
-																																															}
-																																														}
-																																														else
-																																														{
-																																															std::cerr << "--filterSWeight option requires one argument." << std::endl;
-																																															return 0;
-																																														}
-																																													}
-																																													else
-																																														if ((arg == "-fse") || (arg == "--filterSEpsilon"))
-																																														{
-																																															if (i + 1 < argc)
-																																															{
-																																																kernelOpt.albedoTreshold = std::atof(argv[++i]);
-																																															}
-																																															else
-																																															{
-																																																std::cerr << "--filterSEpsilon option requires one argument." << std::endl;
-																																																return 0;
-																																															}
-																																														}
-																																														else
-																																															if ((arg == "-fsad") || (arg == "--filterSAlbedoDivide"))
-																																															{
-																																																if (i + 1 < argc)
-																																																{
-																																																	kernelOpt.albedoDivide = std::atoi(argv[++i]);
-																																																}
-																																																else
-																																																{
-																																																	std::cerr << "--filterSAlbedoDivide option requires one argument." << std::endl;
-																																																	return 0;
-																																																}
-																																															}
-																																															else
-																																																if ((arg == "-fsSpecularStrength") || (arg == "--fsSpecularStrength"))
-																																																{
-																																																	if (i + 1 < argc)
-																																																	{
-																																																		kernelOpt.sSpecularStrength = std::atof(argv[++i]);
-																																																	}
-																																																	else
-																																																	{
-																																																		std::cerr << "--fsSpecularStrength option requires one argument." << std::endl;
-																																																		return 0;
-																																																	}
-																																																}
-																																																else
-																																																	if ((arg == "-fsfKernel") || (arg == "--filterSFKernel"))
-																																																	{
-																																																		if (i + 1 < argc)
-																																																		{
-																																																			kernelOpt.sfkernel = std::atoi(argv[++i]);
-																																																		}
-																																																		else
-																																																		{
-																																																			std::cerr << "--filterSFKernel option requires one argument." << std::endl;
-																																																			return 0;
-																																																		}
-																																																	}
-																																																	else
-																																																		if ((arg == "-fsfRadius") || (arg == "--filterSFRadius"))
-																																																		{
-																																																			if (i + 1 < argc)
-																																																			{
-																																																				kernelOpt.sfradius = std::atoi(argv[++i]);
-																																																			}
-																																																			else
-																																																			{
-																																																				std::cerr << "--filterSFRadius option requires one argument." << std::endl;
-																																																				return 0;
-																																																			}
-																																																		}
-																																																		else
-																																																			if ((arg == "-fsfSigmaColor") || (arg == "--filterSFSigmaColor"))
-																																																			{
-																																																				if (i + 1 < argc)
-																																																				{
-																																																					kernelOpt.sfColor = std::atof(argv[++i]);
-																																																				}
-																																																				else
-																																																				{
-																																																					std::cerr << "--filterSFSigmaColor option requires one argument." << std::endl;
-																																																					return 0;
-																																																				}
-																																																			}
-																																																			else
-																																																				if ((arg == "-fsfSigmaAlbedo") || (arg == "--filterSFSigmaAlbedo"))
-																																																				{
-																																																					if (i + 1 < argc)
-																																																					{
-																																																						kernelOpt.sfAlbedo = std::atof(argv[++i]);
-																																																					}
-																																																					else
-																																																					{
-																																																						std::cerr << "--filterSFSigmaAlbedo option requires one argument." << std::endl;
-																																																						return 0;
-																																																					}
-																																																				}
-																																																				else
-																																																					if ((arg == "-fsfSigmaNormal") || (arg == "--filterSFSigmaNormal"))
-																																																					{
-																																																						if (i + 1 < argc)
-																																																						{
-																																																							kernelOpt.sfNormal = std::atof(argv[++i]);
-																																																						}
-																																																						else
-																																																						{
-																																																							std::cerr << "--filterSFSigmaNormal option requires one argument." << std::endl;
-																																																							return 0;
-																																																						}
-																																																					}
-																																																					else
-																																																						if ((arg == "-fsfSigmaDepth") || (arg == "--filterSFSigmaDepth"))
-																																																						{
-																																																							if (i + 1 < argc)
-																																																							{
-																																																								kernelOpt.sfDepth = std::atof(argv[++i]);
-																																																							}
-																																																							else
-																																																							{
-																																																								std::cerr << "--filterSFSigmaDepth option requires one argument." << std::endl;
-																																																								return 0;
-																																																							}
-																																																						}
-																																																						else
-																																																							if ((arg == "-fsfFallof") || (arg == "--filterSFFallof"))
-																																																							{
-																																																								if (i + 1 < argc)
-																																																								{
-																																																									kernelOpt.sfFallof = std::atof(argv[++i]);
-																																																								}
-																																																								else
-																																																								{
-																																																									std::cerr << "--filterSFFallof option requires one argument." << std::endl;
-																																																									return 0;
-																																																								}
-																																																							}
-																																																							else
-																																																								if ((arg == "-fsfw") || (arg == "--filterSFWeight"))
-																																																								{
-																																																									if (i + 1 < argc)
-																																																									{
-																																																										kernelOpt.sfWeight = std::atof(argv[++i]);
-																																																										if (kernelOpt.sfWeight > 1) {
-																																																											kernelOpt.sfWeight = 1;
-																																																										}
-																																																										if (kernelOpt.sfWeight < 0) {
-																																																											kernelOpt.sfWeight = 0;
-																																																										}
-																																																									}
-																																																									else
-																																																									{
-																																																										std::cerr << "--filterSFWeight option requires one argument." << std::endl;
-																																																										return 0;
-																																																									}
-																																																								}
-																																																								else
-																																																									if ((arg == "-fsfad") || (arg == "--filterSFAlbedoDivide"))
-																																																									{
-																																																										if (i + 1 < argc)
-																																																										{
-																																																											kernelOpt.sfAlbedoDivide = std::atoi(argv[++i]);
-																																																										}
-																																																										else
-																																																										{
-																																																											std::cerr << "--filterSAlbedoDivide option requires one argument." << std::endl;
-																																																											return 0;
-																																																										}
-																																																									}
-																																																									else
-																																																										if ((arg == "-fsfSpecularStrength") || (arg == "--fsfSpecularStrength"))
-																																																										{
-																																																											if (i + 1 < argc)
-																																																											{
-																																																												kernelOpt.sfSpecularStrength = std::atof(argv[++i]);
-																																																											}
-																																																											else
-																																																											{
-																																																												std::cerr << "--fsfSpecularStrength option requires one argument." << std::endl;
-																																																												return 0;
-																																																											}
-																																																										}
-																																																										else
-																																																											if ((arg == "-ftw") || (arg == "--filterTWeight"))
-																																																											{
-																																																												if (i + 1 < argc)
-																																																												{
-																																																													kernelOpt.temporalWeight = std::atof(argv[++i]);
-																																																													if (kernelOpt.temporalWeight > 1) {
-																																																														kernelOpt.temporalWeight = 1;
-																																																													}
-																																																													if (kernelOpt.temporalWeight < 0) {
-																																																														kernelOpt.temporalWeight = 0;
-																																																													}
-																																																												}
-																																																												else
-																																																												{
-																																																													std::cerr << "--filterTWeight option requires one argument." << std::endl;
-																																																													return 0;
-																																																												}
-																																																											}
-																																																											else
-																																																												if ((arg == "-ftFallof") || (arg == "--filterTFallof"))
-																																																												{
-																																																													if (i + 1 < argc)
-																																																													{
-																																																														kernelOpt.tFallof = std::atof(argv[++i]);
-																																																													}
-																																																													else
-																																																													{
-																																																														std::cerr << "--filterTFallof option requires one argument." << std::endl;
-																																																														return 0;
-																																																													}
-																																																												}
-																																																												else
-																																																													if ((arg == "-ftKernel") || (arg == "--filterTKernel"))
-																																																													{
-																																																														if (i + 1 < argc)
-																																																														{
-																																																															kernelOpt.tkernel = std::atoi(argv[++i]);
-																																																														}
-																																																														else
-																																																														{
-																																																															std::cerr << "--filterTKernel option requires one argument." << std::endl;
-																																																															return 0;
-																																																														}
-																																																													}
-																																																													else
-																																																														if ((arg == "-ftPRadius") || (arg == "--filterTPRadius"))
-																																																														{
-																																																															if (i + 1 < argc)
-																																																															{
-																																																																kernelOpt.tPRadius = std::atoi(argv[++i]);
-																																																															}
-																																																															else
-																																																															{
-																																																																std::cerr << "--filterTPRadius option requires one argument." << std::endl;
-																																																																return 0;
-																																																															}
-																																																														}
-																																																														else
-																																																															if ((arg == "-ftbs") || (arg == "--filterTBlockSize"))
-																																																															{
-																																																																if (i + 1 < argc)
-																																																																{
-																																																																	kernelOpt.tBlockSize = std::atoi(argv[++i]);
-																																																																}
-																																																																else
-																																																																{
-																																																																	std::cerr << "--filterTBlockSize option requires one argument." << std::endl;
-																																																																	return 0;
-																																																																}
-																																																															}
-																																																															else
-																																																																if ((arg == "-ftISize") || (arg == "--filterTInterpolation"))
-																																																																{
-																																																																	if (i + 1 < argc)
-																																																																	{
-																																																																		kernelOpt.tInterpolation = std::atof(argv[++i]);
-																																																																	}
-																																																																	else
-																																																																	{
-																																																																		std::cerr << "--filterTInterpolation option requires one argument." << std::endl;
-																																																																		return 0;
-																																																																	}
-																																																																}
-																																																																else
-																																																																	if ((arg == "-ftSigmaColor") || (arg == "--filterTSigmaColor"))
-																																																																	{
-																																																																		if (i + 1 < argc)
-																																																																		{
-																																																																			kernelOpt.tSigmaColor = std::atof(argv[++i]);
-																																																																		}
-																																																																		else
-																																																																		{
-																																																																			std::cerr << "--filterTSigmaColor option requires one argument." << std::endl;
-																																																																			return 0;
-																																																																		}
-																																																																	}
-																																																																	else
-																																																																		if ((arg == "-ftSigmaAlbedo") || (arg == "--filterTSigmaAlbedo"))
-																																																																		{
-																																																																			if (i + 1 < argc)
-																																																																			{
-																																																																				kernelOpt.tSigmaAlbedo = std::atof(argv[++i]);
-																																																																			}
-																																																																			else
-																																																																			{
-																																																																				std::cerr << "--filterTSigmaColor option requires one argument." << std::endl;
-																																																																				return 0;
-																																																																			}
-																																																																		}
-																																																																		else
-																																																																			if ((arg == "-ftmt") || (arg == "--filterTMotionTreshold"))
-																																																																			{
-																																																																				if (i + 1 < argc)
-																																																																				{
-																																																																					kernelOpt.tMotionTreshold = std::atof(argv[++i]);
-																																																																				}
-																																																																				else
-																																																																				{
-																																																																					std::cerr << "--filterTMotionTreshold option requires one argument." << std::endl;
-																																																																					return 0;
-																																																																				}
-																																																																			}
-																																																																			else
-																																																																				if ((arg == "-ftct") || (arg == "--filterTColorTreshold"))
-																																																																				{
-																																																																					if (i + 1 < argc)
-																																																																					{
-																																																																						kernelOpt.tColorTreshold = std::atof(argv[++i]);
-																																																																					}
-																																																																					else
-																																																																					{
-																																																																						std::cerr << "--filterTColorTreshold option requires one argument." << std::endl;
-																																																																						return 0;
-																																																																					}
-																																																																				}
-																																																																				else
-																																																																					if ((arg == "-ftpww") || (arg == "--filterTPwWeight"))
-																																																																					{
-																																																																						if (i + 1 < argc)
-																																																																						{
-																																																																							kernelOpt.temporalPwWeight = std::atof(argv[++i]);
-																																																																							if (kernelOpt.temporalPwWeight > 1) {
-																																																																								kernelOpt.temporalPwWeight = 1;
-																																																																							}
-																																																																							if (kernelOpt.temporalPwWeight < 0) {
-																																																																								kernelOpt.temporalPwWeight = 0;
-																																																																							}
-																																																																						}
-																																																																						else
-																																																																						{
-																																																																							std::cerr << "--filterTPwWeight option requires one argument." << std::endl;
-																																																																							return 0;
-																																																																						}
-																																																																					}
-																																																																					else
-																																																																						if ((arg == "-ftpwFallof") || (arg == "--filterTPwFallof"))
-																																																																						{
-																																																																							if (i + 1 < argc)
-																																																																							{
-																																																																								kernelOpt.tPwFallof = std::atof(argv[++i]);
-																																																																							}
-																																																																							else
-																																																																							{
-																																																																								std::cerr << "--filterTPwFallof option requires one argument." << std::endl;
-																																																																								return 0;
-																																																																							}
-																																																																						}
-																																																																						else
-																																																																							if ((arg == "-ftpwKernel") || (arg == "--filterTPwKernel"))
-																																																																							{
-																																																																								if (i + 1 < argc)
-																																																																								{
-																																																																									kernelOpt.tPwKernel = std::atoi(argv[++i]);
-																																																																								}
-																																																																								else
-																																																																								{
-																																																																									std::cerr << "--filterTPwKernel option requires one argument." << std::endl;
-																																																																									return 0;
-																																																																								}
-																																																																							}
-																																																																							else
-																																																																								if ((arg == "-ftpwPRadius") || (arg == "--filterTPwPRadius"))
-																																																																								{
-																																																																									if (i + 1 < argc)
-																																																																									{
-																																																																										kernelOpt.tPwPRadius = std::atoi(argv[++i]);
-																																																																									}
-																																																																									else
-																																																																									{
-																																																																										std::cerr << "--filterTPwPRadius option requires one argument." << std::endl;
-																																																																										return 0;
-																																																																									}
-																																																																								}
-																																																																								else
-																																																																									if ((arg == "-ftpwSRadius") || (arg == "--filterPwSearchRadius"))
-																																																																									{
-																																																																										if (i + 1 < argc)
-																																																																										{
-																																																																											kernelOpt.tPwSearchRadius = std::atoi(argv[++i]);
-																																																																										}
-																																																																										else
-																																																																										{
-																																																																											std::cerr << "--filterPwSearchRadius option requires one argument." << std::endl;
-																																																																											return 0;
-																																																																										}
-																																																																									}
-																																																																									else
-																																																																										if ((arg == "-ftpwSigmaColor") || (arg == "--filterTPwSigmaColor"))
-																																																																										{
-																																																																											if (i + 1 < argc)
-																																																																											{
-																																																																												kernelOpt.tPwSigmaColor = std::atof(argv[++i]);
-																																																																											}
-																																																																											else
-																																																																											{
-																																																																												std::cerr << "--filterTPwSigmaColor option requires one argument." << std::endl;
-																																																																												return 0;
-																																																																											}
-																																																																										}
-																																																																										else
-																																																																											if ((arg == "-ftpwSigmaAlbedo") || (arg == "--filterTPwSigmaAlbedo"))
-																																																																											{
-																																																																												if (i + 1 < argc)
-																																																																												{
-																																																																													kernelOpt.tPwSigmaAlbedo = std::atof(argv[++i]);
-																																																																												}
-																																																																												else
-																																																																												{
-																																																																													std::cerr << "--filterTPwSigmaAlbedo option requires one argument." << std::endl;
-																																																																													return 0;
-																																																																												}
-																																																																											}
-																																																																											else
-																																																																												if ((arg == "-ftpwSigmaDistance") || (arg == "--filterTPwSigmaDistance"))
-																																																																												{
-																																																																													if (i + 1 < argc)
-																																																																													{
-																																																																														kernelOpt.tPwSigmaDistance = std::atof(argv[++i]);
-																																																																													}
-																																																																													else
-																																																																													{
-																																																																														std::cerr << "--filterTPwSigmaDistance option requires one argument." << std::endl;
-																																																																														return 0;
-																																																																													}
-																																																																												}
-																																																																												else
-																																																																													if ((arg == "-ftpwst") || (arg == "--filterTPwSpaceTreshold"))
-																																																																													{
-																																																																														if (i + 1 < argc)
-																																																																														{
-																																																																															kernelOpt.tPwSpaceTreshold = std::atof(argv[++i]);
-																																																																														}
-																																																																														else
-																																																																														{
-																																																																															std::cerr << "--filterTPwSpaceTreshold option requires one argument." << std::endl;
-																																																																															return 0;
-																																																																														}
-																																																																													}
-																																																																													else
-																																																																														if ((arg == "-ftpwi") || (arg == "--filterTPwIteration"))
-																																																																														{
-																																																																															if (i + 1 < argc)
-																																																																															{
-																																																																																kernelOpt.tPwIterations = std::atoi(argv[++i]);
-																																																																															}
-																																																																															else
-																																																																															{
-																																																																																std::cerr << "--filterTPwIteration option requires one argument." << std::endl;
-																																																																																return 0;
-																																																																															}
-																																																																														}
-	}
+				iOpt.nChannels = argc - i - 1;
+			}
+			else
+			{
+				std::cerr << "--Channels option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-sc") || (arg == "--SpecularChannel"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.fnameSpecular = argv[++i];
+			}
+			else
+			{
+				std::cerr << "--SpecularChannel option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-isc") || (arg == "--IndirectSpecularChannel"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.fnameIndirectSpecular = argv[++i];
+			}
+			else
+			{
+				std::cerr << "--IndirectSpecularChannel option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-dic") || (arg == "--DiffuseChannel"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.fnameDiffuse = argv[++i];
+			}
+			else
+			{
+				std::cerr << "--DiffuseChannel option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-idic") || (arg == "--IndirectDiffuseChannel"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.fnameIndirectDiffuse = argv[++i];
+			}
+			else
+			{
+				std::cerr << "--IndirectDiffuseChannel option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-rc") || (arg == "--RefractionChannel"))
+		{
+			if (i + 1 < argc)
+			{
+				iOpt.fnameRefraction = argv[++i];
+			}
+			else
+			{
+				std::cerr << "--RefractionDiffuseChannel option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-ffkernel") || (arg == "--fireflyKernel"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.ffkernel = std::atoi(argv[++i]);
+            }
+			else
+			{
+				std::cerr << "--fireflyKernel option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-ffgain") || (arg == "--fireflyGain"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.ffGain = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--fireflyGain option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-ffsigma") || (arg == "--fireflySigma"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.ffSigma = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--fireflySigma option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-ffgamma") || (arg == "--fireflyGamma"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.ffGamma = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--fireflyGamma option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-ffRefractionStrange") || (arg == "--ffRefractionStrange"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.ffRefractionStrange = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--ffRefractionStrange option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-ffIndirectSpecularStrange") || (arg == "--ffIndirectSpecularStrange"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.ffindirectSpecStrange = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--ffIndirectSpecularStrange option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsKernel") || (arg == "--filterSKernel"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.skernel = std::atoi(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSKernel option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsRadius") || (arg == "--filterSRadius"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sradius = std::atoi(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSRadius option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsSigmaColor") || (arg == "--filterSSigmaColor"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sColor = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSSigmaColor option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsSigmaAlbedo") || (arg == "--filterSSigmaAlbedo"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sAlbedo = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSSigmaAlbedo option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsSigmaNormal") || (arg == "--filterSSigmaNormal"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sNormal = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSSigmaNormal option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsSigmaDepth") || (arg == "--filterSSigmaDepth"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sDepth = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSSigmaDepth option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsSigmaAlpha") || (arg == "--filterSSigmaAlpha"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sAlpha = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSSigmaAlpha option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fstSigmaColor") || (arg == "--filterSTSigmaColor"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.stColor = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSTSigmaColor option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fstSigmaAlbedo") || (arg == "--filterSTSigmaAlbedo"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.stAlbedo = std::atof(argv[++i]);
+			}
+			else
+			{
+			    std::cerr << "--filterSTSigmaAlbedo option requires one argument." << std::endl;
+			    return 0;
+			}
+		}
+		if ((arg == "-fstSigmaNormal") || (arg == "--filterSTSigmaNormal"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.stNormal = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSTSigmaNormal option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fstSigmaDepth") || (arg == "--filterSTSigmaDepth"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.stDepth = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSTSigmaDepth option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fstSigmaAlpha") || (arg == "--filterSTSigmaAlpha"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.stAlpha = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSTSigmaAlpha option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsFallof") || (arg == "--filterSFallof"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sFallof = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSFallof option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsw") || (arg == "--filterSWeight"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sWeight = std::atof(argv[++i]);
+				if (kernelOpt.sWeight > 1) {
+					kernelOpt.sWeight = 1;
+				}
+				if (kernelOpt.sWeight < 0) {
+					kernelOpt.sWeight = 0;
+				}
+			}
+			else
+			{
+				std::cerr << "--filterSWeight option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fse") || (arg == "--filterSEpsilon"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.albedoTreshold = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSEpsilon option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsad") || (arg == "--filterSAlbedoDivide"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.albedoDivide = std::atoi(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSAlbedoDivide option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsSpecularStrength") || (arg == "--fsSpecularStrength"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sSpecularStrength = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--fsSpecularStrength option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsfKernel") || (arg == "--filterSFKernel"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sfkernel = std::atoi(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSFKernel option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsfRadius") || (arg == "--filterSFRadius"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sfradius = std::atoi(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSFRadius option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsfSigmaColor") || (arg == "--filterSFSigmaColor"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sfColor = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSFSigmaColor option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsfSigmaAlbedo") || (arg == "--filterSFSigmaAlbedo"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sfAlbedo = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSFSigmaAlbedo option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsfSigmaNormal") || (arg == "--filterSFSigmaNormal"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sfNormal = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSFSigmaNormal option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsfSigmaDepth") || (arg == "--filterSFSigmaDepth"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sfDepth = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSFSigmaDepth option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsfFallof") || (arg == "--filterSFFallof"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sfFallof = std::atof(argv[++i]);
+			}
+			else
+			{
+				std::cerr << "--filterSFFallof option requires one argument." << std::endl;
+				return 0;
+			}
+		}
+		if ((arg == "-fsfw") || (arg == "--filterSFWeight"))
+		{
+			if (i + 1 < argc)
+			{
+				kernelOpt.sfWeight = std::atof(argv[++i]);
+				if (kernelOpt.sfWeight > 1) {
+					kernelOpt.sfWeight = 1;
+				}
+				if (kernelOpt.sfWeight < 0) {
+					kernelOpt.sfWeight = 0;
+				}
+			}
+			else
+			{
+				std::cerr << "--filterSFWeight option requires one argument." << std::endl;
+				return 0;
+			}
+		}																																																																}
+	
 	return true;
 }
 
