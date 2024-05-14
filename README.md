@@ -1,2 +1,2 @@
 # Ginznurg Denoiser Software
- Denoising software for remove Monte-Carlo noise
+ Denoising software to remove Monte-Carlo noise
